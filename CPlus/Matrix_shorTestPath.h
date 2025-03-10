@@ -1,8 +1,8 @@
 #include <iostream>
-#include <iostream>
 #include <queue>
 #include <vector>
 #include <algorithm>
+#include <unordered_map>
 using namespace std;
 
 class Graph2 {
@@ -61,16 +61,17 @@ class Graph2 {
         preVertex[start] = -1;
         while( !q.empty() ) {
             int current = q.front();
+            q.pop();
             if (current == end) {
                 return contrucPath(end, preVertex);
             }
-            q.pop();
-            for (auto &next : adjMaxtrix[current] ) {
-                if ( next != 0 ) {
-                    preVertex[next] = current;
+
+            for (int next = 0 ; next < graph.m_vertex; next++) {
+                if (adjMaxtrix[current][next] != 0) {
                     if (visited[next] == false) {
                         q.push(next);
                         visited[next] = true;
+                        preVertex[next] = current;
                     }
                 }
             }
