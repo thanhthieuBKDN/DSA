@@ -93,7 +93,7 @@ namespace G2 {
         g.addEdge(1, 3);
         g.addEdge(2, 3);
         g.addEdge(3, 4);
-        vector<int> v = findShortestPath(g.adjList, 0, 4);
+        vector<int> v = findShortestPath(g.adjList, 4, 0);
         for (int i : v) {
             cout << i << " ";
         }

@@ -1,74 +1,34 @@
-# Labyrinth
-# You are given a map of a labyrinth, and your task is to find a path from start to end. You can
-# walk left, right, up and down.
-# Input
-# The first input line has two integers n and m : the height and width of the map.
-# Then there are n lines of m characters describing the labyrinth. Each character is '.' (foor),
-# #(wall), A (start), or B (end). There is exactly one A and one B in the input.
-# Output
-# First print "YES", if there is a path, and "NO" otherwise.
-# If there is a path, print the length of the shortest such path and its description as a string
-# consisting of characters L (left), R (right), U (up), and D (down). You can print any valid
-# solution.
-
-# n <= 1000
-# m <= 1000
-
-from collections import deque
-
-# Hướng di chuyển: (dx, dy) và ký tự tương ứng
-directions = [(0, -1, 'L'), (0, 1, 'R'), (-1, 0, 'U'), (1, 0, 'D')]
-
-def bfs(labyrinth, n, m, start, end):
-    queue = deque([start])
-    parent = {start: None}  # Lưu vết đường đi
-    dist = {start: 0}  # Lưu khoảng cách từ 'A'
-
-    while queue:
-        x, y = queue.popleft()
-        
-        # Nếu tìm thấy B, dừng BFS
-        if (x, y) == end:
-            return dist[(x, y)], parent
-        
-        for dx, dy, move in directions:
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < n and 0 <= ny < m and labyrinth[nx][ny] != '#' and (nx, ny) not in dist:
-                queue.append((nx, ny))
-                dist[(nx, ny)] = dist[(x, y)] + 1
-                parent[(nx, ny)] = ((x, y), move)  # Lưu cha + hướng đi
-
-    return -1, {}  # Không tìm thấy đường đi
-
-def get_path(parent, start, end):
-    path = []
-    cur = end
-    while cur != start:
-        cur, move = parent[cur]
-        path.append(move)
-    return ''.join(reversed(path))
-
 def solve():
-    # Đọc dữ liệu đầu vào
     n, m = map(int, input().split())
-    labyrinth = [list(input().strip()) for i in range(n)]
+    grid = [input() for _ in range(n)]
 
-    # Tìm vị trí của A và B
-    start, end = None, None
-    for i in range(n):
-        for j in range(m):
-            if labyrinth[i][j] == 'A':
-                start = (i, j)
-            elif labyrinth[i][j] == 'B':
-                end = (i, j)
+    def is_valid(r, c):
+        return 0 <= r < n and 0 <= c < m
 
-    # Chạy BFS để tìm đường đi ngắn nhất
-    distance, parent = bfs(labyrinth, n, m, start, end)
+    def dfs(r, c, start_r, start_c, visited, path):
+        if (r, c) in visited and (r,c) != path[-2] if len(path) > 1 else False :
+            if len(path) >= 4 and (start_r, start_c) == (r,c):
+                return True
+            else:
+                return False
 
-    if distance == -1:
-        print("NO")
-    else:
-        print("YES")
-        print(distance)
-        print(get_path(parent, start, end))
+        visited.add((r, c))
+        path.append((r,c))
 
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if is_valid(nr, nc) and grid[nr][nc] == grid[start_r][start_c]:
+                if dfs(nr, nc, start_r, start_c, visited.copy(), path.copy()):
+                    return True
+        return False
+
+    for r in range(n):
+        for c in range(m):
+            if dfs(r, c, r, c, set(), []):
+                print("Yes")
+                return
+
+    print("No")
+
+solve()
